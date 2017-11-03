@@ -8,3 +8,4 @@ export const GET_POST_COMMENT = "GET_POST_COMMENT";
 
 export const POST_NEW_POST = "POST_NEW_POST";
 
+export const POST_ADD_COMMENT = "POST_ADD_COMMENT";

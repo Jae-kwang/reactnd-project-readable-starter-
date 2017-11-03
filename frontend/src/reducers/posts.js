@@ -31,6 +31,12 @@ export default function post(state, action) {
       return update(state, {
         list: { $push: [action.post] }
       });
+
+    case types.POST_ADD_COMMENT:
+      return update(state, {
+        comments: { $push: [action.comment] }
+      });
+
     default:
       return state;
   }

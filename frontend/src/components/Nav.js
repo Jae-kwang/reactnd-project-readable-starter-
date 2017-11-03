@@ -4,8 +4,6 @@ import { Menu } from 'semantic-ui-react';
 
 class Nav extends Component {
 
-
-
   render() {
     const { categories, activeCategorie, onClickHandler } = this.props;
 

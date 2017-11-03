@@ -1,20 +1,65 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getPostsComment } from '../actions/post';
-import { Container, Header, Icon, Breadcrumb, Comment, Form, Button} from 'semantic-ui-react'
+import { addComment } from '../actions/comments';
+import { Container, Header, Icon, Breadcrumb, Comment, Form, Button, Input, TextArea} from 'semantic-ui-react'
+import update from 'react-addons-update';
+import shortid from 'shortid';
 
 class PostDetail extends Component {
 
-  // constructor(props) {
-  //   super(props);
-  // }
+  constructor(props) {
+    super(props);
 
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+
+    this.state = {
+      comment_data: {
+        id: shortid.generate(),
+        timestamp: Date.now(),
+        parentId: this.props.id,
+        author: '',
+        body: ''
+      }
+    };
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+
+    let defaultSubmitCommentData = {
+      id: shortid.generate(),
+      timestamp: Date.now(),
+      parentId: this.props.id
+    };
+
+    this.setState({
+      comment_data: update(
+        this.state.comment_data,
+        {
+          $merge: defaultSubmitCommentData
+        }
+      )
+    });
+
+    this.props.addComment(this.state.comment_data);
+  }
+
+  handleChange(e) {
+    this.setState({
+      comment_data: update(
+        this.state.comment_data,
+        {
+          $merge: {[e.target.name]: e.target.value}
+        }
+      )
+    });
+  }
+  
   componentDidMount() {
-
     const { id, getPostsComment } = this.props;
-
     getPostsComment(id);
-
   };
 
   filterPost = (data) => {
@@ -30,7 +75,9 @@ class PostDetail extends Component {
 
     return (
       <Container>
+
         <Header size="huge">{post.title}</Header>
+
         <Breadcrumb>
           <Breadcrumb.Section><Icon name="calendar"/> {new Date(post.timestamp).toLocaleDateString()}</Breadcrumb.Section>
           <Breadcrumb.Divider />
@@ -40,6 +87,7 @@ class PostDetail extends Component {
           <Breadcrumb.Divider />
           <Breadcrumb.Section><Icon name="thumbs outline up"/> {post.voteScore}</Breadcrumb.Section>
         </Breadcrumb>
+
         <p>{post.body}</p>
 
         <Comment.Group>
@@ -59,8 +107,11 @@ class PostDetail extends Component {
               )
             })
           }
-          <Form reply>
-            <Form.TextArea />
+          <Form reply action="/comments" onSubmit={(e) => this.handleSubmit(e)}>
+            <Form.Group>
+              <Form.Field control={Input} label='Author' name="author" placeholder='Author' onChange={this.handleChange}/>
+            </Form.Group>
+            <Form.Field control={TextArea} label='Body' name="body" placeholder='Body' onChange={this.handleChange}/>
             <Button content='Add Reply' labelPosition='left' icon='edit' primary />
           </Form>
         </Comment.Group>
@@ -81,6 +132,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     getPostsComment: (id) => {
       return dispatch(getPostsComment(id));
+    },
+    addComment: (data) => {
+      return dispatch(addComment(data));
     }
   }
 };

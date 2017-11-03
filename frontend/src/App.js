@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { getCategories } from './actions/categories';
 import { getPosts } from './actions/post';
 
-import { Container, Grid } from 'semantic-ui-react'
+import { Container, Grid } from 'semantic-ui-react';
 
 import { PostList, Nav } from './components';
 import { NewPost, PostDetail } from './containers';
@@ -51,15 +51,28 @@ class App extends Component {
     const { activeCategorie, selectedPostId } = this.state;
     const { categories, posts } = this.props;
 
+    posts.sort((a, b) => {
+      return -(a.voteScore - b.voteScore);
+    });
+    
     const filterdPost = (activeCategorie !== 'all') ? posts.filter(this.filterPost) : posts;
 
+    const containerStyle = {
+      marginTop: '20px'
+    };
+    
     return (
-      <Container>
+      <Container style={containerStyle}>
+
         <Grid>
+
           <Grid.Column floated="left" width={4}>
-            <Nav categories={categories} activeCategorie={activeCategorie} onClickHandler={this.handle_select_category}/>
+            <Nav categories={categories}
+                 activeCategorie={activeCategorie}
+                 onClickHandler={this.handle_select_category}/>
             <NewPost/>
           </Grid.Column>
+
           <Grid.Column floated="left" width={12}>
             {
               (!selectedPostId)
@@ -67,7 +80,9 @@ class App extends Component {
                 : <PostDetail id={selectedPostId}/>
             }
           </Grid.Column>
+
         </Grid>
+
       </Container>
     );
   }
